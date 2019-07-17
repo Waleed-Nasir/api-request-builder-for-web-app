@@ -15,6 +15,7 @@ import Up from '@material-ui/icons/ArrowDropUp';
 import Down from '@material-ui/icons/ArrowDropDown';
 import { TextField, IconButton } from '@material-ui/core/es';
 import Input from '@material-ui/core/Input';
+import  axios from "axios";
 const styles = (theme) => ({
   root: {
     width: '100%',
@@ -158,17 +159,53 @@ class CurlBuilderModal extends React.Component {
     this.setState({ open: true });
 };
 
-generateCurl = (requ) => {
-    let headers = requ.header.map((req) => req.name && req.value && `-H '${req.name}: ${req.value}'`);
-    return `curl -X${requ.type} ${headers ? headers.join(' ') : ''} '${requ.url}'`;
+generateCurl = async (requ,header)  => {
+    if(requ.type === 'POST'){
+    var data = await axios.post(requ.url,requ.body,{ headers:header,}).then(res=>res).catch(err=>err)
+    console.log(data,'generateWithCurl')
+    return data;
+    }
+    if(requ.type === 'PUT'){
+      var data = await axios.put(requ.url,requ.body,{ headers:header,}).then(res=>res).catch(err=>err)
+    console.log(data,'generateWithCurl')
+    return data;
+    }
+    if(requ.type === 'DELETE'){
+      if(requ.body !== ''){
+      var data = await axios.delete(requ.url,requ.body,{ headers:header,}).then(res=>res).catch(err=>err)  
+    console.log(data,'generateWithCurl')
+      return data;
+    }else{
+      var data = await axios.delete(requ.url,{ headers:header,}).then(res=>res).catch(err=>err)
+    console.log(data,'generateWithCurl',header)
+      return data;
+    }        
+    }
+    if(requ.type === 'GET'){
+      var data = await axios.get(requ.url,{ headers:header,}).then(res=>res).catch(err=>err) 
+    console.log(data,'generateWithCurl',header)
+      return data;
+    }
+    // let headers = requ.header.map((req) => req.name && req.value && `-H '${req.name}: ${req.value}'`);
+    // if(requ.type === 'POST' || requ.type === 'PUT'){
+    //   return `curl -X${requ.type} ${headers ? headers.join(' ') : ''} ${requ.body.length ? `-d '${requ.body.trim()}'`:'' } '${requ.url.trim()}'`.replace(/\s\s+/g, ' ');
+    // }
+    // else {
+    //   return `curl -X${requ.type} ${headers ? headers.join(' ') : ''} '${requ.url.trim()}'`.replace(/\s\s+/g, ' ');;
+    // }
 };
 
 generateBuilder = () => {
   const { requestBuilder } = this.state;
   const { actionFunctions } = this.props;
+  // let generateWithCurl = requestBuilder.map((reques, ind) => {
+  //   reques.curl = this.generateCurl(reques);
+  //   return reques;
+  // });
   let generateWithCurl = requestBuilder.map((reques, ind) => {
-    reques.curl = this.generateCurl(reques);
-    return reques;
+    var obj={}
+     var header = reques.header?Object.keys(reques.header).map(ab=> obj[reques.header[ab].name]=reques.header[ab].value):{}
+        return this.generateCurl(reques,obj);
   });
   console.log(generateWithCurl,'generateWithCurl')
   };
@@ -254,7 +291,7 @@ generateBuilder = () => {
                       id: 'type-simple',
                     }}
                   >
-                    <MenuItem value={'POST'}>Post</MenuItem>
+                    <MenuItem value={'POST'}>POST</MenuItem>
                     <MenuItem value={'GET'}>GET</MenuItem>
                     <MenuItem value={'PUT'}>PUT</MenuItem>
                     <MenuItem value={'DELETE'}>DELETE</MenuItem>
