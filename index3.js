@@ -394,21 +394,6 @@ class ApiTesterBody extends React.Component {
                     onChange={(e) => this.handleChange(e, index, 'value', Hindex, false)}
                   />
                 </div>)) : ''}
-                 {(MRT.type === 'POST' || MRT.type === 'PUT') &&
-              <div className={classes.bodyArea}>
-              <Input
-                id="outlined-multiline-flexible"
-                placeholder="body"
-                multiline
-                fullWidth
-                rowsMax="5"
-                rows='5'
-                value={MRT.body}
-                onChange={(e) => this.handleChange(e, index, 'body', '', true)}
-                variant="outlined"
-              />
-              </div>
-              }
                 { MRT.response &&<span style={{color:'gray'}}>Response</span>}
               <div className={classes.meanContainer}>
                    { MRT.response&&<div className={classes.commderLine} style={{marginTop: '0px',padding:'5px 20px 5px 20px', flexDirection: 'row',display:'flex',}} >
